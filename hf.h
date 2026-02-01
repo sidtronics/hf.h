@@ -107,7 +107,7 @@ typedef enum {
   HF_ERROR_MSG_CONVERSION_ERROR
 } hf_error;
 
-typedef struct {
+typedef struct _hf_context {
   uint32_t cur;
   uint32_t end;
   hf_error error;
@@ -182,7 +182,7 @@ typedef enum {
 #undef X
 } hf_header;
 
-typedef struct {
+typedef struct _hf_message {
   hf_header _header;
   uint16_t _mask;
 #define X(String, FlagIdentifier, Type, Name) Type Name;
