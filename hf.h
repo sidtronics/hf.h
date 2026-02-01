@@ -463,9 +463,10 @@ const char *hf_get_error_string(hf_context *ctx) {
     return "unknown header encountered";
   case HF_ERROR_MSG_CONVERSION_ERROR:
     return "failed to convert a numeric value";
-  default:
-    assert(0 && "unreachable");
   }
+
+  assert(0 && "unreachable");
+  return NULL;
 }
 
 #if defined(HF_HEADERS) && defined(HF_FIELDS)
