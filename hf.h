@@ -482,11 +482,13 @@ const char *hf_get_error_string(hf_context *ctx) {
 #if defined(HF_HEADERS) && defined(HF_FIELDS)
 
 static inline bool __hf_tostr(HF_STRING_T *dest, const char *src) {
+
   *dest = src;
   return true;
 }
 
 static inline bool __hf_toint(HF_INTEGER_T *dest, const char *src) {
+
   char *endptr = NULL;
   long long val;
 
@@ -504,6 +506,7 @@ static inline bool __hf_toint(HF_INTEGER_T *dest, const char *src) {
 }
 
 static inline bool __hf_todbl(HF_DOUBLE_T *dest, const char *src) {
+
   char *endptr = NULL;
   double val;
 
