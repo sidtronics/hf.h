@@ -544,14 +544,14 @@ bool hf_message_parse(hf_context *ctx, hf_message *msg) {
   if (!hf_parse_header(ctx, &header))
     return false;
 
-  uint16_t mask = 0;
+  uint16_t vmask = 0;
 
   if (0) {
   }
 #define X(String, Identifier, ValidFieldsMask)                                 \
   else if (strcmp(String, header) == 0) {                                      \
     msg->_header = Identifier;                                                 \
-    mask = ValidFieldsMask;                                                    \
+    vmask = ValidFieldsMask;                                                   \
   }
   HF_HEADERS
 #undef X
@@ -569,7 +569,7 @@ bool hf_message_parse(hf_context *ctx, hf_message *msg) {
     if (0) {
     }
 #define X(String, FlagIdentifier, Type, Name)                                  \
-  else if ((mask & FlagIdentifier) && strcmp(key, String) == 0) {              \
+  else if ((vmask & FlagIdentifier) && strcmp(key, String) == 0) {             \
     if (!(_Generic((msg->Name),                                                \
               HF_STRING_T: __hf_tostr,                                         \
               HF_INTEGER_T: __hf_toint,                                        \
