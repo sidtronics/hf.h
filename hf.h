@@ -631,6 +631,7 @@ bool hf_message_build(hf_context *ctx, hf_message *msg) {
 /*  Revision History:
  *
  *   0.1 (2026-01-20) Initial release
+ *   0.2.0 (2026-05-01) Add support for boolean type HF_BOOL_T
  *
  */
 
