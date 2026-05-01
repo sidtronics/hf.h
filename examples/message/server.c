@@ -24,6 +24,7 @@ void handle_request_addition(hf_message *msg);
 void handle_request_subtraction(hf_message *msg);
 void handle_request_division(hf_message *msg);
 void handle_request_capitalise(hf_message *msg);
+void handle_request_light(hf_message *msg);
 
 int main(void) {
 
@@ -104,6 +105,10 @@ void handle_request() {
 
   case HEADER_CAPITALISE:
     handle_request_capitalise(&msg);
+    break;
+
+  case HEADER_LIGHT:
+    handle_request_light(&msg);
     break;
 
   case HEADER_DIVISION:
@@ -195,6 +200,24 @@ void handle_request_capitalise(hf_message *msg) {
 
   for (size_t i = 0; i < strlen(text); ++i)
     text[i] = toupper(text[i]);
+
+  hf_message_set_header(msg, HEADER_RESULT);
+  hf_message_set_field_text(msg, text);
+}
+
+void handle_request_light(hf_message *msg) {
+
+  if (!hf_message_mask_has_all(msg, KEY_VALUE)) {
+    ERROR("missing fields in request");
+    exit(1);
+  }
+
+  bool value = hf_message_get_field_value(msg);
+
+  printf("[server]: Request: Header: HEADER_LIGHT\t");
+  printf("text: %s\n", value ? "true" : "false");
+
+  snprintf(text, STRING_BUFFER_SIZE, "Lights are turned %s.", value ? "on" : "off");
 
   hf_message_set_header(msg, HEADER_RESULT);
   hf_message_set_field_text(msg, text);

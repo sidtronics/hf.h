@@ -22,6 +22,7 @@ void create_request_add(hf_message *msg, unsigned long op1, unsigned long op2);
 void create_request_sub(hf_message *msg, unsigned long op1, unsigned long op2);
 void create_request_div(hf_message *msg, unsigned long op1, unsigned long op2);
 void create_request_cap(hf_message *msg, const char *text);
+void create_request_lgt(hf_message *msg, const char *text);
 
 int main(void) {
 
@@ -61,7 +62,8 @@ int main(void) {
     printf("1. Subtraction\n");
     printf("2. Division\n");
     printf("3. Capitalise\n");
-    printf("4. Quit\n");
+    printf("4. Lights\n");
+    printf("5. Quit\n");
     printf("Choose operation: ");
     scanf("%d", &input);
 
@@ -87,6 +89,11 @@ int main(void) {
       create_request_cap(&msg, text);
       break;
     case 4:
+      printf("Lights status (on/off): ");
+      scanf("%127s", text);
+      create_request_lgt(&msg, text);
+      break;
+    case 5:
       exit(0);
     default:
       continue;
@@ -129,6 +136,19 @@ void create_request_cap(hf_message *msg, const char *text) {
 
   hf_message_set_header(msg, HEADER_CAPITALISE);
   hf_message_set_field_text(msg, text);
+
+  if (!hf_message_build(&ctx, msg)) {
+    fprintf(stderr, "[client]: %s\n", hf_get_error_string(&ctx));
+    exit(1);
+  }
+}
+
+void create_request_lgt(hf_message *msg, const char *text) {
+    
+  hf_message_set_header(msg, HEADER_LIGHT);
+
+  if (strcmp(text, "on") == 0) hf_message_set_field_value(msg, true);
+  else hf_message_set_field_value(msg, false);
 
   if (!hf_message_build(&ctx, msg)) {
     fprintf(stderr, "[client]: %s\n", hf_get_error_string(&ctx));
