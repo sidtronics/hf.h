@@ -23,6 +23,7 @@
  *  String  (HF_STRING_T)
  *  Integer (HF_INTEGER_T)
  *  Double  (HF_DOUBLE_T)
+ *  Bool    (HF_BOOL_T)
  *
  * Configuration Options
  * ---------------------
@@ -91,6 +92,7 @@
 typedef const char *HF_STRING_T;
 typedef int64_t HF_INTEGER_T;
 typedef double HF_DOUBLE_T;
+typedef _Bool HF_BOOL_T;
 
 #ifndef HF_BUFFER_SIZE
 #define HF_BUFFER_SIZE 512
@@ -140,6 +142,7 @@ bool hf_append_header(hf_context *ctx, const char *header);
 bool hf_append_field_str(hf_context *ctx, const char *key, HF_STRING_T val);
 bool hf_append_field_int(hf_context *ctx, const char *key, HF_INTEGER_T val);
 bool hf_append_field_dbl(hf_context *ctx, const char *key, HF_DOUBLE_T val);
+bool hf_append_field_bool(hf_context *ctx, const char *key, HF_BOOL_T val);
 
 #define hf_append_field(ctx, key, val)                                         \
   _Generic((val),                                                              \
@@ -147,7 +150,8 @@ bool hf_append_field_dbl(hf_context *ctx, const char *key, HF_DOUBLE_T val);
       char *: hf_append_field_str,                                             \
       HF_INTEGER_T: hf_append_field_int,                                       \
       int: hf_append_field_int,                                                \
-      HF_DOUBLE_T: hf_append_field_dbl)((ctx), (key), (val))
+      HF_DOUBLE_T: hf_append_field_dbl,                                        \
+      HF_BOOL_T: hf_append_field_bool)((ctx), (key), (val))
 
 bool hf_end_message(hf_context *ctx);
 
@@ -438,6 +442,12 @@ bool hf_append_field_dbl(hf_context *ctx, const char *key, HF_DOUBLE_T val) {
   return __hf_append(ctx, "%s:%f\n", key, val);
 }
 
+bool hf_append_field_bool(hf_context *ctx, const char *key, HF_BOOL_T val) {
+
+  assert(ctx->error == HF_ERROR_SUCCESS);
+  return __hf_append(ctx, "%s:%s\n", key, val ? "true" : "false");
+}
+
 bool hf_end_message(hf_context *ctx) {
 
   assert(ctx->error == HF_ERROR_SUCCESS);
@@ -462,7 +472,7 @@ const char *hf_get_error_string(hf_context *ctx) {
   case HF_ERROR_MSG_UNKNOWN_HEADER:
     return "unknown header encountered";
   case HF_ERROR_MSG_CONVERSION_ERROR:
-    return "failed to convert a numeric value";
+    return "type conversion error";
   }
 
   assert(0 && "unreachable");
@@ -507,6 +517,21 @@ static inline bool __hf_todbl(HF_DOUBLE_T *dest, const char *src) {
   return true;
 }
 
+static inline bool __hf_tobool(HF_BOOL_T *dest, const char *src) {
+
+  if (strcmp(src, "true") == 0) {
+    *dest = true;
+    return true;
+  }
+
+  if (strcmp(src, "false") == 0) {
+    *dest = false;
+    return true;
+  }
+
+  return false;
+}
+
 bool hf_message_parse(hf_context *ctx, hf_message *msg) {
 
   assert(ctx->error == HF_ERROR_SUCCESS);
@@ -545,7 +570,8 @@ bool hf_message_parse(hf_context *ctx, hf_message *msg) {
     if (!(_Generic((msg->Name),                                                \
               HF_STRING_T: __hf_tostr,                                         \
               HF_INTEGER_T: __hf_toint,                                        \
-              HF_DOUBLE_T: __hf_todbl))(&msg->Name, val)) {                    \
+              HF_DOUBLE_T: __hf_todbl,                                         \
+              HF_BOOL_T: __hf_tobool))(&msg->Name, val)) {                     \
       ctx->error = HF_ERROR_MSG_CONVERSION_ERROR;                              \
       return false;                                                            \
     }                                                                          \
