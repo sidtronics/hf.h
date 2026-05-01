@@ -1,5 +1,5 @@
 /*
- * HF — Header Fields v0.1.1
+ * HF — Header Fields v0.2.0
  *
  * Message Format
  * --------------
